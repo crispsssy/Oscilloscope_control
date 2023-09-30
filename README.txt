@@ -10,5 +10,7 @@ Set mask of your computer to 255.255.255.0
 compile osc_control.cxx
 run osc_control and use -h or --help option to see how to use it
 
+You can change verbose level in header file to control output level
+
 
 -------------------------------------------------------------------------
