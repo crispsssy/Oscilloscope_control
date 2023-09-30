@@ -1,3 +1,13 @@
+/***************************************
+*                                      *
+* Tektronix 3 series oscilloscope      *
+* Control software                     *
+*                                      *
+* 2023/09/30 Siyuan Sun                *
+* use standard c++ compiler to compile *
+*                                      *
+***************************************/
+
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
