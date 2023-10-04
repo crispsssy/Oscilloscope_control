@@ -44,9 +44,9 @@ void SocketQuery(int const socketOsc, char const* cmd){
         
 	//receive reponse from remote host
 	memset(recv_str, 0, sizeof(recv_str));         //memory initialize
-	std::cout<<"Receiving reponse..."<<std::endl;
+	if(verbose >= 1) std::cout<<"Receiving reponse..."<<std::endl;
 	while( int ret = recv(socketOsc, recv_str, sizeof(recv_str), 0) > 0){
-		std::cout<<ret<<" "<<recv_str<<std::endl; 
+		std::cout<<recv_str<<std::endl; 
 		if(strchr(recv_str, '\n') != NULL) break;
 		memset(recv_str, 0, sizeof(recv_str)); 
 	}
@@ -183,7 +183,10 @@ std::string TranslateCommand(std::string const& mode, std::string const& cmd){
 
 		else if (cmd == "dataStop?")         return "DATA:STOP?\n";
 
-		else if (cmd == "rms?")              return "POWer:HARMonics:RESults:RMS?\n";
+		else if (cmd == "meas1StdDev?")              return "MEASUrement:MEAS1:STDdev?\n";
+		else if (cmd == "meas2StdDev?")              return "MEASUrement:MEAS2:STDdev?\n";
+		else if (cmd == "meas3StdDev?")              return "MEASUrement:MEAS3:STDdev?\n";
+		else if (cmd == "meas4StdDev?")              return "MEASUrement:MEAS4:STDdev?\n";
 		else{
 			std::cerr<<"no such command!"<<std::endl;
 			exit(-1);
@@ -224,6 +227,11 @@ std::string TranslateCommand(std::string const& mode, std::string const& cmd, st
 		else if (cmd == "yScaleCH3")         return "CH3:SCAle " + parameter + "\n";
 		else if (cmd == "yScaleCH4")         return "CH4:SCAle " + parameter + "\n";
 
+		else if (cmd == "meas1Source")       return "MEASUrement:MEAS1:SOUrce CH" + parameter + "\n";
+		else if (cmd == "meas2Source")       return "MEASUrement:MEAS2:SOUrce CH" + parameter + "\n";
+		else if (cmd == "meas3Source")       return "MEASUrement:MEAS3:SOUrce CH" + parameter + "\n";
+		else if (cmd == "meas4Source")       return "MEASUrement:MEAS4:SOUrce CH" + parameter + "\n";
+
 		else if (cmd == "sendCommand")       return parameter + "\n";
 		else{ std::cerr<<"no such command!"<<std::endl; exit(-1); }
 	}
@@ -253,6 +261,10 @@ void Usage(){
 	std::cout<<"     command <\033[32myResolution?\033[0m> returns vertical resolution of waveform"<<std::endl;
 	std::cout<<"     command <\033[32myUnit?\033[0m> returns vertical unit of waveform [V, mV, etc.]"<<std::endl;
 	std::cout<<"     command <\033[32mdataStop?\033[0m> returns number of data points will be transferred"<<std::endl;
+	std::cout<<"     command <\033[32mmeas1StdDev?\033[0m> returns standard deviation from measurement block 1"<<std::endl;
+	std::cout<<"     command <\033[32mmeas2StdDev?\033[0m> returns standard deviation from measurement block 2"<<std::endl;
+	std::cout<<"     command <\033[32mmeas3StdDev?\033[0m> returns standard deviation from measurement block 3"<<std::endl;
+	std::cout<<"     command <\033[32mmeas4StdDev?\033[0m> returns standard deviation from measurement block 4"<<std::endl;
 	std::cout<<"mode <\033[32m-s\033[0m> or <\033[32m--send\033[0m>: send command to oscilloscope (need parameter after command)"<<std::endl;
 	std::cout<<"     command <\033[32mtriggerType\033[0m> specifies the trigger type [edge, logic, pulse, bus, video]"<<std::endl;
 	std::cout<<"     command <\033[32mtriggerThreshold\033[0m> specifies the threshold of trigger"<<std::endl;
@@ -274,6 +286,10 @@ void Usage(){
 	std::cout<<"     command <\033[32myScaleCH2\033[0m> specifies the vertical scale of channel 2 [V/div]"<<std::endl;
 	std::cout<<"     command <\033[32myScaleCH3\033[0m> specifies the vertical scale of channel 3 [V/div]"<<std::endl;
 	std::cout<<"     command <\033[32myScaleCH4\033[0m> specifies the vertical scale of channel 4 [V/div]"<<std::endl;
+	std::cout<<"     command <\033[32mmeas1Source\033[0m> specifies the source of channel [1,2,3,4] to measurement block 1"<<std::endl;
+	std::cout<<"     command <\033[32mmeas2Source\033[0m> specifies the source of channel [1,2,3,4] to measurement block 2"<<std::endl;
+	std::cout<<"     command <\033[32mmeas3Source\033[0m> specifies the source of channel [1,2,3,4] to measurement block 3"<<std::endl;
+	std::cout<<"     command <\033[32mmeas4Source\033[0m> specifies the source of channel [1,2,3,4] to measurement block 4"<<std::endl;
 	std::cout<<"     command <\033[32msendCommand\033[0m> directly send command to oscilloscope"<<std::endl;
 	std::cout<<"mode <\033[32m-r\033[0m> or <\033[32m--read\033[0m>: read waveform from oscilloscope and save as txt files"<<std::endl;
 	std::cout<<"              \033[33m./osc_control <mode> <channels> <number of events>"<<std::endl;
