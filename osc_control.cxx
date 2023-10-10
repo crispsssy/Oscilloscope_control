@@ -54,9 +54,9 @@ void SocketQuery(int const socketOsc, char const* cmd){
 	close(socketOsc);
 }
 
-std::string GetParameter(int const socketOsc, char const* cmd){
+std::string GetParameter(int const socketOsc, std::string const& cmd){
 	char recv_str[256];
-	SendCommand(socketOsc, cmd);
+	SendCommand(socketOsc, cmd.c_str());
 	
 	//receive reponse from remote host
 	memset(recv_str, 0, sizeof(recv_str));         //memory initialize
@@ -94,7 +94,7 @@ void ReadData(int const socketOsc, std::string const& Chs, int const nEvent){
 	//get parameters
 	SendCommand(socketOsc, "HEADer OFF\n");
 	std::vector<int> num_pt, num_byte;
-	std::vector<double> xZero, yZero, xIncr, yMult;
+	std::vector<double> xZero, yZero, xIncr, yMult, yPos, yScale;
 	for(int iCh=0; iCh<nCh; ++iCh){
 		std::string cmd_select = "SELect:CH" + std::to_string(ch.at(iCh)) + " ON\n";
 		std::string cmd_source = "DATa:SOUrce CH" + std::to_string(ch.at(iCh)) + "\n";
@@ -106,13 +106,15 @@ void ReadData(int const socketOsc, std::string const& Chs, int const nEvent){
 		yZero.push_back(    stod(GetParameter(socketOsc, "WFMOutpre:YZEro?\n")));
 		yMult.push_back(    stod(GetParameter(socketOsc, "WFMOutpre:YMUlt?\n")));
 		num_byte.push_back( stoi(GetParameter(socketOsc, "WFMOutpre:BYT_Nr?\n")));
+		yPos.push_back(     stod(GetParameter(socketOsc, "CH" + std::to_string(ch.at(iCh)) +":POSition?\n")));
+		yScale.push_back(   stod(GetParameter(socketOsc, "CH" + std::to_string(ch.at(iCh)) +":SCAle?\n")));
 	}
 
 	//Read data
 	std::string recv_str;
 	char recv_char[9192];
 	SendCommand(socketOsc, "ACQuire:STOPAfter SEQuence\n");
-	SendCommand(socketOsc, "DESE 1\n");
+	SendCommand(socketOsc, "DESE 1\n");  //refer to Tektronix 3 MDO programming manual page 3-10 to understand these commands
 	SendCommand(socketOsc, "*ESE 1\n");
 	SendCommand(socketOsc, "*SRE 0\n");
 	for(int iEvent=0; iEvent < nEvent; ++iEvent){
@@ -136,14 +138,17 @@ void ReadData(int const socketOsc, std::string const& Chs, int const nEvent){
 			std::string pt;
 			int index = 0;
 			while(getline(ss, pt, ',')){
-				f_out << xZero.at(iCh) + xIncr.at(iCh) * index <<" "<< yZero.at(iCh) + yMult.at(iCh) * stod(pt) << std::endl;
+				f_out << xZero.at(iCh) + xIncr.at(iCh) * index
+				<<" "
+				<< yZero.at(iCh) + yMult.at(iCh) * stod(pt) - ( yPos.at(iCh) * yScale.at(iCh) )
+				<< std::endl;
 				++index;
 			}
 			f_out.close();
 		}
 		if(verbose >= 1){
 			if(iEvent == 0) std::cout<<iEvent + 1<<"/"<<nEvent<<" finished"<<std::endl;
-			else std::cout<<"\033[1A\033[K"<<iEvent + 1<<"/"<<nEvent<<" finished"<<std::endl;
+			else std::cout<<"\033[1A\033[K\033[32m"<<iEvent + 1<<"/"<<nEvent<<" finished"<<"\033[0m"<<std::endl;
 		}
 	}
 	if(verbose >= 1){
