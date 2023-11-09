@@ -85,7 +85,7 @@ void ReadData(int const socketOsc, std::string const& Chs, int const nEvent){
 	time_t timep;
 	time(&timep);
 	char dirNameTmp[64];
-	strftime(dirNameTmp, sizeof(dirNameTmp), "%Y%m%d%H%M%S", localtime(&timep) );
+	strftime(dirNameTmp, sizeof(dirNameTmp), "%Y-%m-%d-%H-%M-%S", localtime(&timep) );
 	if( mkdir(dirNameTmp, S_IRWXU) != 0){
 		std::cerr<<"Failed to create directory to save waveform data"<<std::endl;
 		exit(-1);
