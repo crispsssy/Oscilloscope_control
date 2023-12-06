@@ -247,7 +247,7 @@ std::string TranslateCommand(std::string const& mode, std::string const& cmd, st
 void Usage(){
 	std::cout<<"./osc_control <mode> <command> <parameter>"<<std::endl;
 	std::cout<<"mode <\033[32m-q\033[0m> or <\033[32m--query\033[0m>: get information (no parameter needed)"<<std::endl;
-	std::cout<<"notice that for the last questionare sign you need to put a \\ before it"<<std::endl;
+	std::cout<<"notice that for the last question mark you need to put a \\ before it"<<std::endl;
 	std::cout<<"     command <\033[32midentify\033[0m> returns machine information"<<std::endl;
 	std::cout<<"     command <\033[32mtriggerType?\033[0m> returns current trigger type"<<std::endl;
 	std::cout<<"     command <\033[32mtriggerThreshold?\033[0m> returns the threshold of trigger"<<std::endl;
@@ -281,8 +281,8 @@ void Usage(){
 	std::cout<<"     command <\033[32mchannel3\033[0m> turn [on, off] the channel 3"<<std::endl;
 	std::cout<<"     command <\033[32mchannel4\033[0m> turn [on, off] the channel 4"<<std::endl;
 	std::cout<<"     command <\033[32mchannelSelect\033[0m> specifies the channel that been selected to use"<<std::endl;
-	std::cout<<"     command <\033[32mwavefirnAcquire\033[0m> specifies the waveform acquisition method [runStop, sequence]"<<std::endl;
-	std::cout<<"     command <\033[32mwavefirnAcquire\033[0m> turn [on, off] the waveform acquisition"<<std::endl;
+	std::cout<<"     command <\033[32mwaveformAcquire\033[0m> specifies the waveform acquisition method [runStop, sequence]"<<std::endl;
+	std::cout<<"     command <\033[32macquireState\033[0m> turn [on, off] the waveform acquisition"<<std::endl;
 	std::cout<<"     command <\033[32mheader\033[0m> turn [on, off] the header information"<<std::endl;
 	std::cout<<"     command <\033[32mxOffset\033[0m> specifies the horizontal offset"<<std::endl;
 	std::cout<<"     command <\033[32mxScale\033[0m> specifies the horizontal scale [s/div]"<<std::endl;
