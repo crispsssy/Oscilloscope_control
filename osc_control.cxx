@@ -114,12 +114,9 @@ void ReadData(int const socketOsc, std::string const& Chs, int const nEvent){
 	std::string recv_str;
 	char recv_char[9192];
 	SendCommand(socketOsc, "ACQuire:STOPAfter SEQuence\n");
-	SendCommand(socketOsc, "DESE 1\n");  //refer to Tektronix 3 MDO programming manual page 3-10 to understand these commands
-	SendCommand(socketOsc, "*ESE 1\n");
-	SendCommand(socketOsc, "*SRE 0\n");
 	for(int iEvent=0; iEvent < nEvent; ++iEvent){
 		SendCommand(socketOsc, "ACQuire:STATE ON\n");
-		SendCommand(socketOsc, "*OPC\n");
+		SendCommand(socketOsc, "*WAI\n");
 		for(int iCh=0; iCh < nCh; ++iCh){
 			std::string cmd = "DATa:SOUrce CH" + std::to_string(ch.at(iCh)) + "\n";
 			SendCommand(socketOsc, cmd.c_str());
