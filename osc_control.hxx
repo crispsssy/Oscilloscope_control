@@ -27,7 +27,7 @@
 #include <arpa/inet.h>
 #include <time.h>
 
-char const* host_ip("192.168.10.55");
+char const* host_ip("192.168.10.3");
 int const portNum = 4000;
 int const verbose = 1;
 
