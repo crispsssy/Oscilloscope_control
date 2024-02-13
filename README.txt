@@ -2,7 +2,7 @@ Control software for Tektronix 3 series oscilloscope
 
 How to use:
 connect your computer with oscilloscope by LAN cable
-Set IP of oscilloscope to 192.168.10.55
+Set IP of oscilloscope to 192.168.10.55(or 192.168.10.XX)
 Set mask of oscilloscope to 255.255.255.0
 Set IP of your computer to 192.168.10.10(or 192.168.10.XX)
 Set mask of your computer to 255.255.255.0
