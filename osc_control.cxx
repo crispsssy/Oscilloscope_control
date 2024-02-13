@@ -70,7 +70,16 @@ std::string GetParameter(int const socketOsc, std::string const& cmd){
 	return recv_str;
 }
 
+std::string MakeString(double input){   //This function exists because the precision of std::to_string() is 6 and can not be changed.
+	std::stringstream ss;
+	ss<<input;
+	return ss.str();
+}
+
 void ReadData(int const socketOsc, std::string const& Chs, int const nEvent){
+	//reset the parameters for xZero, xIncr, yZero, yMult. Without setting mode to RUNStop these parameters can not be successfully set.
+	SendCommand(socketOsc, "ACQuire:STOPAfter RUNStop\n");
+	SendCommand(socketOsc, "ACQuire:STATE RUN\n");
 	//Calculate time cost
 	clock_t tStart = clock();
 	//get channel numbers
@@ -101,25 +110,32 @@ void ReadData(int const socketOsc, std::string const& Chs, int const nEvent){
 		SendCommand(socketOsc, cmd_select.c_str());
 		SendCommand(socketOsc, cmd_source.c_str());
 		num_pt.push_back(   stoi(GetParameter(socketOsc, "WFMOutpre:NR_pt?\n")));
+		yPos.push_back(     stod(GetParameter(socketOsc, "CH" + std::to_string(ch.at(iCh)) +":POSition?\n")));
+		yScale.push_back(   stod(GetParameter(socketOsc, "CH" + std::to_string(ch.at(iCh)) +":SCAle?\n")));
+		
 		xZero.push_back(    stod(GetParameter(socketOsc, "WFMOutpre:XZEro?\n")));
 		xIncr.push_back(    stod(GetParameter(socketOsc, "WFMOutpre:XINcr?\n")));
 		yZero.push_back(    stod(GetParameter(socketOsc, "WFMOutpre:YZEro?\n")));
 		yMult.push_back(    stod(GetParameter(socketOsc, "WFMOutpre:YMUlt?\n")));
 		num_byte.push_back( stoi(GetParameter(socketOsc, "WFMOutpre:BYT_Nr?\n")));
-		yPos.push_back(     stod(GetParameter(socketOsc, "CH" + std::to_string(ch.at(iCh)) +":POSition?\n")));
-		yScale.push_back(   stod(GetParameter(socketOsc, "CH" + std::to_string(ch.at(iCh)) +":SCAle?\n")));
+
+		if(verbose >= 2){
+			std::cout<<"ch"<<ch.at(iCh)<<":"<<std::endl;
+			std::cout<<"xZero = "<<xZero.at(iCh)<<std::endl;
+			std::cout<<"xIncr = "<<xIncr.at(iCh)<<std::endl;
+			std::cout<<"yScale = "<<yScale.at(iCh)<<std::endl;
+			std::cout<<"yZero = "<<yZero.at(iCh)<<std::endl;
+			std::cout<<"yMult = "<<yMult.at(iCh)<<std::endl;
+		}
 	}
 
 	//Read data
 	std::string recv_str;
 	char recv_char[9192];
 	SendCommand(socketOsc, "ACQuire:STOPAfter SEQuence\n");
-	SendCommand(socketOsc, "DESE 1\n");  //refer to Tektronix 3 MDO programming manual page 3-10 to understand these commands
-	SendCommand(socketOsc, "*ESE 1\n");
-	SendCommand(socketOsc, "*SRE 0\n");
 	for(int iEvent=0; iEvent < nEvent; ++iEvent){
 		SendCommand(socketOsc, "ACQuire:STATE ON\n");
-		SendCommand(socketOsc, "*OPC\n");
+		SendCommand(socketOsc, "*WAI\n");
 		for(int iCh=0; iCh < nCh; ++iCh){
 			std::string cmd = "DATa:SOUrce CH" + std::to_string(ch.at(iCh)) + "\n";
 			SendCommand(socketOsc, cmd.c_str());
@@ -140,7 +156,7 @@ void ReadData(int const socketOsc, std::string const& Chs, int const nEvent){
 			while(getline(ss, pt, ',')){
 				f_out << xZero.at(iCh) + xIncr.at(iCh) * index
 				<<" "
-				<< yZero.at(iCh) + yMult.at(iCh) * stod(pt) - ( yPos.at(iCh) * yScale.at(iCh) )
+				<< yMult.at(iCh) * stod(pt) - ( yPos.at(iCh) * yScale.at(iCh) )
 				<< std::endl;
 				++index;
 			}
@@ -182,7 +198,10 @@ std::string TranslateCommand(std::string const& mode, std::string const& cmd){
 		else if (cmd == "xResolution?")      return "WFMInpre:XINcr?\n";
 		else if (cmd == "xUnit?")            return "WFMInpre:XUNit?\n";
 
-		else if (cmd == "yOffset?")          return "WFMInpre:YZEro?\n";
+		else if (cmd == "yOffsetCH1?")       return "CH1:POSition?\n";
+		else if (cmd == "yOffsetCH2?")       return "CH2:POSition?\n";
+		else if (cmd == "yOffsetCH3?")       return "CH3:POSition?\n";
+		else if (cmd == "yOffsetCH4?")       return "CH4:POSition?\n";
 		else if (cmd == "yResolution?")      return "WFMInpre:YMUlt?\n";
 		else if (cmd == "yUnit?")            return "WFMInpre:YUNit?\n";
 
@@ -223,6 +242,7 @@ std::string TranslateCommand(std::string const& mode, std::string const& cmd, st
 		else if (cmd == "header")            return "HEADer " + parameter + "\n";
 
 		else if (cmd == "xOffset")           return "WFMInpre:XZEro " + parameter + "\n";
+		else if (cmd == "xResolution")       return "WFMInpre:XINcr " + parameter + "\n";
 		else if (cmd == "xScale")            return "HORizontal:SCAle " + parameter + "\n";
 
 		else if (cmd == "yOffset")           return "WFMInpre:YZEro " + parameter + "\n";
