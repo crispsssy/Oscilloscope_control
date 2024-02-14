@@ -31,7 +31,7 @@ char const* host_ip("192.168.10.3");
 int const portNum = 4000;
 int const verbose = 1;
 
-int SocketConnect();
+int cosnt SocketConnect();
 void SocketQuery(int const socketOsc, char const* cmd);
 void SendCommand(int const socketOsc, char const* cmd);
 std::string GetParameter(int const socketOsc, std::string const& cmd);
