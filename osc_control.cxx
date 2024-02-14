@@ -1,6 +1,6 @@
 #include "osc_control.hxx"
 
-int SocketConnect(){
+int const SocketConnect(){
 	int socketOsc;
 	struct sockaddr_in serverAddr;
 
