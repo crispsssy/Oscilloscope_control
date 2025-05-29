@@ -35,6 +35,6 @@ int SocketConnect();
 void SocketQuery(int const socketOsc, char const* cmd);
 void SendCommand(int const socketOsc, char const* cmd);
 std::string GetParameter(int const socketOsc, std::string const& cmd);
-void ReadData(int const socketOsc, std::string const& Chs, int const nEvnet);
+void ReadData(int const socketOsc, std::string const& Chs, int const nEvnet, std::string const& dirNameExternal = "");
 std::string TranslateCommand(std::string const& mode, std::string const& cmd);
 std::string TranslateCommand(std::string const& mode, std::string const& cmd, std::string const& parameter);
