@@ -1,6 +1,6 @@
 #include "osc_control.hxx"
 
-int SocketConnect(){
+int const SocketConnect(){
 	int socketOsc;
 	struct sockaddr_in serverAddr;
 
@@ -330,7 +330,7 @@ int main(int argc, char** argv){
 	}
 	std::string mode = argv[1];
 	std::string cmd;
-	int socketOsc = SocketConnect();
+	int const socketOsc = SocketConnect();
 
 	if(verbose >= 1) std::cout<<"mode = "<<mode << std::endl;
 	if(mode == "-q" || mode == "--query"){
