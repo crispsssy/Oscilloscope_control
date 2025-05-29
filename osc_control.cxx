@@ -76,7 +76,7 @@ std::string MakeString(double input){   //This function exists because the preci
 	return ss.str();
 }
 
-void ReadData(int const socketOsc, std::string const& Chs, int const nEvent){
+void ReadData(int const socketOsc, std::string const& Chs, int const nEvent, std::string const& dirNameExternal){
 	//reset the parameters for xZero, xIncr, yZero, yMult. Without setting mode to RUNStop these parameters can not be successfully set.
 	SendCommand(socketOsc, "ACQuire:STOPAfter RUNStop\n");
 	SendCommand(socketOsc, "ACQuire:STATE RUN\n");
@@ -95,11 +95,13 @@ void ReadData(int const socketOsc, std::string const& Chs, int const nEvent){
 	time(&timep);
 	char dirNameTmp[64];
 	strftime(dirNameTmp, sizeof(dirNameTmp), "%Y-%m-%d-%H-%M-%S", localtime(&timep) );
-	if( mkdir(dirNameTmp, S_IRWXU) != 0){
+	std::string dirName(dirNameTmp);
+    //or decided externally
+    if(dirNameExternal.size() != 0) dirName = dirNameExternal;
+	if( mkdir(dirName.c_str(), S_IRWXU) != 0){
 		std::cerr<<"Failed to create directory to save waveform data"<<std::endl;
 		exit(-1);
 	}
-	std::string dirName(dirNameTmp);
 	//get parameters
 	SendCommand(socketOsc, "HEADer OFF\n");
 	std::vector<int> num_pt, num_byte;
@@ -317,12 +319,12 @@ void Usage(){
 	std::cout<<"     command <\033[32mmeas4Source\033[0m> specifies the source of channel [1,2,3,4] to measurement block 4"<<std::endl;
 	std::cout<<"     command <\033[32msendCommand\033[0m> directly send command to oscilloscope"<<std::endl;
 	std::cout<<"mode <\033[32m-r\033[0m> or <\033[32m--read\033[0m>: read waveform from oscilloscope and save as txt files"<<std::endl;
-	std::cout<<"              \033[33m./osc_control <mode> <channels> <number of events>"<<std::endl;
+	std::cout<<"              \033[33m./osc_control <mode> <channels> <number of events> <dirName (optional)>"<<std::endl;
 	std::cout<<"         e.g. \033[33m./osc_control -r 1,4 100\033[0m will read 100 events from channel 1 and channel 4 respectively"<<std::endl;
 }
 
 int main(int argc, char** argv){
-	if(argc <3 || argc > 4){
+	if(argc <3 || argc > 5){
 		Usage();
 		exit(-1);
 	}
@@ -346,14 +348,18 @@ int main(int argc, char** argv){
 		SendCommand(socketOsc, cmd.c_str());
 	}
 	else if(mode == "-r" || mode == "--read"){
-		if(argc != 4){
+		if(argc < 4 || argc > 5){
 			std::cerr<<"need parameter for this mode!"<<std::endl;
 			exit(-1);
 		}
 		if(verbose >= 1) std::cout<<"Data acquisition mode"<<std::endl;
 		std::string Chs = argv[2];
 		int nEvent = atoi(argv[3]);
-		ReadData(socketOsc, Chs, nEvent);
+        std::string dirName = "";
+        if(argc == 5){
+            dirName = argv[4];
+        }
+		ReadData(socketOsc, Chs, nEvent, dirName);
 	}
 	else if(mode == "-h" || mode == "--help"){
 		Usage();
